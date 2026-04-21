@@ -1,0 +1,62 @@
+scalar BigInt
+scalar DateTime
+
+enum OrderStatus {
+  PENDING
+  FUNDED
+  FULFILLED
+  RELEASED
+  DISPUTED
+  RESOLVED
+}
+
+type Order {
+  id: ID!
+  onChainId: Int!
+  buyer: String!
+  seller: String!
+  amount: String!
+  status: OrderStatus!
+  txHash: String
+  blockNumber: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  buyerUser: User
+}
+
+type User {
+  id: ID!
+  address: String!
+  createdAt: DateTime!
+  orders: [Order!]!
+}
+
+type EscrowStatus {
+  orderId: Int!
+  onChainStatus: String!
+  balance: String!
+}
+
+type CreateOrderResponse {
+  order: Order!
+  message: String!
+}
+
+type Query {
+  orders(status: OrderStatus, buyer: String, seller: String): [Order!]!
+  order(id: ID!): Order
+  orderByChainId(onChainId: Int!): Order
+  users: [User!]!
+  user(address: String!): User
+  escrowStatus(orderId: Int!): EscrowStatus!
+}
+
+type Mutation {
+  createOrder(buyer: String!, seller: String!, amount: String!): CreateOrderResponse!
+  deposit(orderId: ID!, txHash: String!, blockNumber: Int): Order!
+  fulfill(orderId: ID!): Order!
+  release(orderId: ID!): Order!
+  dispute(orderId: ID!): Order!
+  resolve(orderId: ID!, winner: String!): Order!
+  upsertUser(address: String!): User!
+}

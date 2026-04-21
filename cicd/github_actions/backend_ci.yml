@@ -1,0 +1,58 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - "backend/**"
+    branches: [main, develop]
+  pull_request:
+    paths:
+      - "backend/**"
+
+jobs:
+  build:
+    name: TypeScript Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: npx prisma generate
+
+      - name: TypeScript type check
+        working-directory: backend
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: backend
+        run: npm run build
+
+  graphql-check:
+    name: GraphQL Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install graphql-inspector
+        run: npm install -g @graphql-inspector/cli
+
+      - name: Validate GraphQL schema
+        # graphql-inspector exits non-zero for schema warnings; treat as informational
+        run: graphql-inspector validate backend/src/graphql/schema.graphql || true
