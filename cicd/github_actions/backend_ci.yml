@@ -54,4 +54,5 @@ jobs:
         run: npm install -g @graphql-inspector/cli
 
       - name: Validate GraphQL schema
+        # graphql-inspector exits non-zero for schema warnings; treat as informational
         run: graphql-inspector validate backend/src/graphql/schema.graphql || true

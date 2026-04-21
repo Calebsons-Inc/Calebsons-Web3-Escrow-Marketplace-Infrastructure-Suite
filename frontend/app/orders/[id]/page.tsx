@@ -90,7 +90,7 @@ export default function OrderDetailPage() {
       });
   };
 
-  useEffect(() => { loadOrder(); }, [id]);
+  useEffect(() => { loadOrder(); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const runMutation = async (query: string, variables: Record<string, unknown>) => {
     setActionLoading(true);

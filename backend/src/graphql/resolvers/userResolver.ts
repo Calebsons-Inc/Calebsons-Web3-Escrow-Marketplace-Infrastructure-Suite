@@ -1,18 +1,20 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+interface Context {
+  prisma: PrismaClient;
+}
 
 export const userResolvers = {
   Query: {
-    users: async () => {
-      return prisma.user.findMany({
+    users: async (_: unknown, __: unknown, context: Context) => {
+      return context.prisma.user.findMany({
         orderBy: { createdAt: "desc" },
         include: { orders: true },
       });
     },
 
-    user: async (_: unknown, args: { address: string }) => {
-      return prisma.user.findUnique({
+    user: async (_: unknown, args: { address: string }, context: Context) => {
+      return context.prisma.user.findUnique({
         where: { address: args.address },
         include: { orders: true },
       });
@@ -20,8 +22,8 @@ export const userResolvers = {
   },
 
   Mutation: {
-    upsertUser: async (_: unknown, args: { address: string }) => {
-      return prisma.user.upsert({
+    upsertUser: async (_: unknown, args: { address: string }, context: Context) => {
+      return context.prisma.user.upsert({
         where: { address: args.address },
         update: {},
         create: { address: args.address },

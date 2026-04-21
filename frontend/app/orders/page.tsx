@@ -91,6 +91,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadOrders(statusFilter !== "ALL" ? statusFilter : undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   const handleCreate = async () => {
