@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:latest
+    platform: linux/amd64
+    command: >
+      anvil
+      --host 0.0.0.0
+      --port 8545
+      --chain-id 31337
+      --block-time 2
+      --accounts 10
+      --balance 10000
+    ports:
+      - "8545:8545"
+    healthcheck:
+      test: ["CMD", "cast", "block-number", "--rpc-url", "http://localhost:8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - escrow-net
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: escrow_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - escrow-net
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/escrow_db"
+      RPC_URL: "http://anvil:8545"
+      ESCROW_CONTRACT_ADDRESS: "${ESCROW_CONTRACT_ADDRESS:-0x0000000000000000000000000000000000000000}"
+      PORT: "4000"
+      FRONTEND_URL: "http://localhost:3000"
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      anvil:
+        condition: service_healthy
+    networks:
+      - escrow-net
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    environment:
+      NEXT_PUBLIC_GRAPHQL_URL: "http://backend:4000/graphql"
+      NEXT_PUBLIC_RPC_URL: "http://anvil:8545"
+      NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS: "${ESCROW_CONTRACT_ADDRESS:-0x0000000000000000000000000000000000000000}"
+      NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: "${WALLETCONNECT_PROJECT_ID:-demo-project-id}"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - escrow-net
+
+volumes:
+  postgres_data:
+
+networks:
+  escrow-net:
+    driver: bridge

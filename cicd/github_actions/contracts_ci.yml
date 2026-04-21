@@ -1,0 +1,61 @@
+name: Contracts CI
+
+on:
+  push:
+    paths:
+      - "contracts/**"
+    branches: [main, develop]
+  pull_request:
+    paths:
+      - "contracts/**"
+
+jobs:
+  test:
+    name: Foundry Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install OpenZeppelin dependencies
+        working-directory: contracts
+        run: forge install OpenZeppelin/openzeppelin-contracts --no-commit
+
+      - name: Run Foundry tests
+        working-directory: contracts
+        run: forge test -vvv
+
+      - name: Check contract sizes
+        working-directory: contracts
+        run: forge build --sizes
+
+  slither:
+    name: Slither Security Analysis
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install OpenZeppelin dependencies
+        working-directory: contracts
+        run: forge install OpenZeppelin/openzeppelin-contracts --no-commit
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.3.0
+        with:
+          target: contracts/src/
+          slither-args: "--exclude-dependencies --checklist"
+        continue-on-error: true

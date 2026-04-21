@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  onChainId   Int      @unique
+  buyer       String
+  seller      String
+  amount      String
+  status      String   @default("PENDING")
+  txHash      String?
+  blockNumber Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  buyerUser   User?    @relation(fields: [buyer], references: [address])
+}
