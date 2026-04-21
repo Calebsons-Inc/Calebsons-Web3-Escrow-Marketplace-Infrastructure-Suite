@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { WalletConnect } from "@/components/WalletConnect";
@@ -77,7 +77,7 @@ export default function OrderDetailPage() {
   const [winnerInput, setWinnerInput] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
-  const loadOrder = () => {
+  const loadOrder = useCallback(() => {
     if (!id) return;
     fetchGraphQL<OrderData>(GET_ORDER, { id })
       .then((data) => {
@@ -88,9 +88,9 @@ export default function OrderDetailPage() {
         setError(err.message);
         setLoading(false);
       });
-  };
+  }, [id]);
 
-  useEffect(() => { loadOrder(); }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { loadOrder(); }, [loadOrder]);
 
   const runMutation = async (query: string, variables: Record<string, unknown>) => {
     setActionLoading(true);

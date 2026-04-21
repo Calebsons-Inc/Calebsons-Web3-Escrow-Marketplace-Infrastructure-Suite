@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { WalletConnect } from "@/components/WalletConnect";
 import { fetchGraphQL } from "@/lib/graphqlClient";
@@ -75,7 +75,7 @@ export default function OrdersPage() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ buyer: "", seller: "", amount: "" });
 
-  const loadOrders = (status?: string) => {
+  const loadOrders = useCallback((status?: string) => {
     setLoading(true);
     const variables = status && status !== "ALL" ? { status } : {};
     fetchGraphQL<OrdersData>(GET_ORDERS, variables)
@@ -87,12 +87,11 @@ export default function OrdersPage() {
         setError(err.message);
         setLoading(false);
       });
-  };
+  }, []);
 
   useEffect(() => {
     loadOrders(statusFilter !== "ALL" ? statusFilter : undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  }, [statusFilter, loadOrders]);
 
   const handleCreate = async () => {
     setCreating(true);
