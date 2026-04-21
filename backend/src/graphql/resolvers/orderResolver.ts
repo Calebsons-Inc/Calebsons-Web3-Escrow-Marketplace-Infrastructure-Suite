@@ -108,6 +108,7 @@ export const orderResolvers = {
       _: unknown,
       args: { orderId: string; winner: string }
     ) => {
+      console.log(`Dispute resolved for order ${args.orderId}: winner = ${args.winner}`);
       return prisma.order.update({
         where: { id: args.orderId },
         data: { status: "RESOLVED" },

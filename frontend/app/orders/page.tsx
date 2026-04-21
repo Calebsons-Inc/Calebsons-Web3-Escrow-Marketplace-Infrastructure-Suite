@@ -237,6 +237,7 @@ export default function OrdersPage() {
                   className="input-field"
                   placeholder="0.1"
                   step="0.001"
+                  min="0"
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
                 />

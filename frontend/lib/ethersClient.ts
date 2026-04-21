@@ -28,7 +28,11 @@ export function getReadOnlyContract(providerUrl?: string): ethers.Contract {
 
 export async function getSignedContract(): Promise<ethers.Contract | null> {
   if (typeof window === "undefined") return null;
-  const provider = new ethers.BrowserProvider((window as unknown as { ethereum: ethers.Eip1193Provider }).ethereum);
+  const ethereum = (window as unknown as { ethereum?: ethers.Eip1193Provider }).ethereum;
+  if (!ethereum) {
+    throw new Error("No Web3 wallet detected. Please install MetaMask or another compatible wallet.");
+  }
+  const provider = new ethers.BrowserProvider(ethereum);
   const signer = await provider.getSigner();
   return new ethers.Contract(ESCROW_CONTRACT_ADDRESS, ESCROW_ABI, signer);
 }
