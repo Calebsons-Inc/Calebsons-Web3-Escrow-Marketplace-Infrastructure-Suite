@@ -8,5 +8,10 @@ solc-version = "0.8.24"
 optimizer = true
 optimizer-runs = 200
 
+remappings = [
+  "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+  "forge-std/=lib/forge-std/src/"
+]
+
 [rpc_endpoints]
 localhost = "http://127.0.0.1:8545"

@@ -1,0 +1,85 @@
+# -----------------------------
+# Global
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node modules (backend + frontend)
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# TypeScript
+*.tsbuildinfo
+
+# -----------------------------
+# Backend (Node + Prisma)
+# -----------------------------
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.turbo/
+backend/.cache/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Prisma generated client
+backend/node_modules/.prisma/
+
+# -----------------------------
+# Frontend (Next.js)
+# -----------------------------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+frontend/.turbo/
+frontend/.cache/
+
+# Next.js static export
+frontend/export/
+
+# -----------------------------
+# Contracts (Foundry)
+# -----------------------------
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/
+
+# Foundry artifacts
+contracts/forge-artifacts/
+contracts/forge-cache/
+
+# -----------------------------
+# Docker
+# -----------------------------
+docker/*.pid
+docker/*.log
+
+# -----------------------------
+# OS / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.iml
+
+# -----------------------------
+# Misc
+# -----------------------------
+coverage/
+coverage-final.json
+lcov.info
